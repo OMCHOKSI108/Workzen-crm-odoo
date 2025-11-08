@@ -1,0 +1,1478 @@
+openapi: 3.0.3
+info:
+  title: WorkZen HRMS API
+  description: Human Resource Management System API for WorkZen
+  version: 1.0.0
+  contact:
+    name: WorkZen Support
+    email: support@workzen.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.workzen.com/api
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+paths:
+  # Authentication
+  /auth/login:
+    post:
+      summary: User login
+      description: Authenticate user and return JWT token
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: employee@workzen.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/logout:
+    post:
+      summary: User logout
+      description: Invalidate user session
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Logged out successfully
+
+  /auth/me:
+    get:
+      summary: Get current user profile
+      description: Get authenticated user's profile information
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Employees
+  /employees:
+    get:
+      summary: Get employees list
+      description: Get paginated list of employees (Admin/HR only)
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Items per page
+        - name: department
+          in: query
+          schema:
+            type: string
+          description: Filter by department
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name or email
+      responses:
+        '200':
+          description: Employees list retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Employee'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        example: 1
+                      limit:
+                        type: integer
+                        example: 10
+                      total:
+                        type: integer
+                        example: 50
+                      pages:
+                        type: integer
+                        example: 5
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Create new employee
+      description: Create a new employee record (Admin/HR only)
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeInput'
+      responses:
+        '201':
+          description: Employee created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Employee'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /employees/{id}:
+    get:
+      summary: Get employee by ID
+      description: Get detailed employee information
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Employee ID
+      responses:
+        '200':
+          description: Employee retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update employee
+      description: Update employee information (Admin/HR only)
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Employee ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeInput'
+      responses:
+        '200':
+          description: Employee updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Employee'
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete employee
+      description: Delete employee record (Admin only)
+      tags:
+        - Employees
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Employee ID
+      responses:
+        '200':
+          description: Employee deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Employee deleted successfully
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Attendance
+  /attendance/punch:
+    post:
+      summary: Punch attendance
+      description: Record clock-in or clock-out
+      tags:
+        - Attendance
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [in, out]
+                  example: in
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: Optional timestamp (defaults to now)
+                location:
+                  type: object
+                  properties:
+                    latitude:
+                      type: number
+                      example: 12.9716
+                    longitude:
+                      type: number
+                      example: 77.5946
+      responses:
+        '200':
+          description: Attendance recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Attendance'
+                  message:
+                    type: string
+                    example: Clocked in successfully
+
+  /attendance:
+    get:
+      summary: Get attendance records
+      description: Get attendance records with optional filters
+      tags:
+        - Attendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeId
+          in: query
+          schema:
+            type: string
+          description: Filter by employee ID
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Start date (YYYY-MM-DD)
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: End date (YYYY-MM-DD)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Attendance records retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Attendance'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        example: 1
+                      limit:
+                        type: integer
+                        example: 10
+                      total:
+                        type: integer
+                        example: 100
+                      pages:
+                        type: integer
+                        example: 10
+
+  /attendance/{id}:
+    put:
+      summary: Update attendance record
+      description: Update attendance record (HR/Admin only)
+      tags:
+        - Attendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Attendance record ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clockIn:
+                  type: string
+                  format: date-time
+                clockOut:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Attendance updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Attendance'
+
+  # Leaves
+  /leaves:
+    get:
+      summary: Get leave requests
+      description: Get leave requests (filtered by user role)
+      tags:
+        - Leaves
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected, cancelled]
+          description: Filter by status
+        - name: employeeId
+          in: query
+          schema:
+            type: string
+          description: Filter by employee ID (Admin/HR only)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Leave requests retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Leave'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        example: 1
+                      limit:
+                        type: integer
+                        example: 10
+                      total:
+                        type: integer
+                        example: 25
+                      pages:
+                        type: integer
+                        example: 3
+
+    post:
+      summary: Apply for leave
+      description: Submit a new leave request
+      tags:
+        - Leaves
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - startDate
+                - endDate
+                - type
+                - reason
+              properties:
+                startDate:
+                  type: string
+                  format: date
+                  example: "2024-01-15"
+                endDate:
+                  type: string
+                  format: date
+                  example: "2024-01-17"
+                type:
+                  type: string
+                  enum: [annual, sick, personal, maternity, paternity, other]
+                  example: annual
+                reason:
+                  type: string
+                  example: "Family vacation"
+                partialDay:
+                  type: boolean
+                  default: false
+                  description: Whether it's a partial day leave
+      responses:
+        '201':
+          description: Leave request created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Leave'
+        '400':
+          description: Validation error or insufficient leave balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /leaves/{id}/approve:
+    post:
+      summary: Approve leave request
+      description: Approve a leave request (HR/Admin only)
+      tags:
+        - Leaves
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Leave request ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comments:
+                  type: string
+                  example: "Approved for family vacation"
+      responses:
+        '200':
+          description: Leave approved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Leave'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /leaves/{id}/reject:
+    post:
+      summary: Reject leave request
+      description: Reject a leave request (HR/Admin only)
+      tags:
+        - Leaves
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Leave request ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comments:
+                  type: string
+                  example: "Cannot approve during peak season"
+      responses:
+        '200':
+          description: Leave rejected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Leave'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Payroll
+  /payroll/payrun/simulate:
+    post:
+      summary: Simulate payrun
+      description: Generate payrun preview for selected employees and period
+      tags:
+        - Payroll
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - month
+                - year
+                - employeeIds
+              properties:
+                month:
+                  type: integer
+                  minimum: 1
+                  maximum: 12
+                  example: 12
+                year:
+                  type: integer
+                  example: 2024
+                employeeIds:
+                  type: array
+                  items:
+                    type: string
+                  example: ["64f1a2b3c4d5e6f7g8h9i0j1", "64f1a2b3c4d5e6f7g8h9i0j2"]
+      responses:
+        '200':
+          description: Payrun simulation completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Payrun'
+                  message:
+                    type: string
+                    example: Payrun simulation completed successfully
+
+  /payroll/payrun/commit:
+    post:
+      summary: Commit payrun
+      description: Finalize and commit payrun, generate payslips
+      tags:
+        - Payroll
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - payrunId
+              properties:
+                payrunId:
+                  type: string
+                  example: "64f1a2b3c4d5e6f7g8h9i0j3"
+      responses:
+        '200':
+          description: Payrun committed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Payrun'
+                  message:
+                    type: string
+                    example: Payrun committed and payslips generated
+
+  /payroll/payrun/{id}:
+    get:
+      summary: Get payrun details
+      description: Get detailed payrun information including payslips
+      tags:
+        - Payroll
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Payrun ID
+      responses:
+        '200':
+          description: Payrun details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payrun'
+
+  /payroll/payslips:
+    get:
+      summary: Get payslips
+      description: Get payslips for current user or all users (Admin/Payroll)
+      tags:
+        - Payroll
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeId
+          in: query
+          schema:
+            type: string
+          description: Filter by employee ID (Admin/Payroll only)
+        - name: month
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+        - name: year
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Payslips retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payslip'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        example: 1
+                      limit:
+                        type: integer
+                        example: 10
+                      total:
+                        type: integer
+                        example: 50
+                      pages:
+                        type: integer
+                        example: 5
+
+  /payroll/payslips/{id}:
+    get:
+      summary: Get payslip by ID
+      description: Get detailed payslip information
+      tags:
+        - Payroll
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Payslip ID
+      responses:
+        '200':
+          description: Payslip retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payslip'
+
+  # Reports
+  /reports/payroll:
+    get:
+      summary: Payroll report
+      description: Generate payroll summary report
+      tags:
+        - Reports
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 12
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 2024
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv]
+            default: json
+          description: Report format
+      responses:
+        '200':
+          description: Payroll report generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        employeeId:
+                          type: string
+                        employeeName:
+                          type: string
+                        basic:
+                          type: number
+                        allowances:
+                          type: number
+                        deductions:
+                          type: number
+                        netPay:
+                          type: number
+            text/csv:
+              schema:
+                type: string
+                description: CSV formatted payroll report
+
+  /reports/attendance:
+    get:
+      summary: Attendance report
+      description: Generate attendance summary report
+      tags:
+        - Reports
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-12-01"
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-12-31"
+        - name: department
+          in: query
+          schema:
+            type: string
+          description: Filter by department
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv]
+            default: json
+      responses:
+        '200':
+          description: Attendance report generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        employeeId:
+                          type: string
+                        employeeName:
+                          type: string
+                        department:
+                          type: string
+                        totalDays:
+                          type: integer
+                        presentDays:
+                          type: integer
+                        absentDays:
+                          type: integer
+                        leaveDays:
+                          type: integer
+                        attendancePercentage:
+                          type: number
+
+  /reports/leaves:
+    get:
+      summary: Leave report
+      description: Generate leave summary report
+      tags:
+        - Reports
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-12-01"
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-12-31"
+        - name: department
+          in: query
+          schema:
+            type: string
+          description: Filter by department
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv]
+            default: json
+      responses:
+        '200':
+          description: Leave report generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        employeeId:
+                          type: string
+                        employeeName:
+                          type: string
+                        department:
+                          type: string
+                        annualLeave:
+                          type: object
+                          properties:
+                            used:
+                              type: number
+                            balance:
+                              type: number
+                        sickLeave:
+                          type: object
+                          properties:
+                            used:
+                              type: number
+                            balance:
+                              type: number
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Authorization header using the Bearer scheme
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Validation error"
+        errors:
+          type: array
+          items:
+            type: string
+          example: ["Email is required", "Password must be at least 6 characters"]
+
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j1"
+        email:
+          type: string
+          format: email
+          example: "employee@workzen.com"
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        role:
+          type: string
+          enum: [admin, hr, payroll, employee]
+          example: "employee"
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Employee:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j1"
+        user:
+          $ref: '#/components/schemas/User'
+        employeeId:
+          type: string
+          example: "EMP001"
+        department:
+          type: string
+          example: "Engineering"
+        jobTitle:
+          type: string
+          example: "Software Engineer"
+        salary:
+          type: object
+          properties:
+            basic:
+              type: number
+              example: 50000
+            hra:
+              type: number
+              example: 25000
+            allowances:
+              type: number
+              example: 10000
+            pfEmployee:
+              type: number
+              example: 6000
+            pfEmployer:
+              type: number
+              example: 6000
+        bankDetails:
+          type: object
+          properties:
+            accountNumber:
+              type: string
+              example: "1234567890"
+            ifscCode:
+              type: string
+              example: "SBIN0001234"
+            bankName:
+              type: string
+              example: "State Bank of India"
+        dateOfJoining:
+          type: string
+          format: date
+          example: "2023-01-15"
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    EmployeeInput:
+      type: object
+      required:
+        - user
+        - employeeId
+        - department
+        - jobTitle
+        - salary
+      properties:
+        user:
+          type: object
+          required:
+            - email
+            - firstName
+            - lastName
+            - role
+          properties:
+            email:
+              type: string
+              format: email
+            firstName:
+              type: string
+            lastName:
+              type: string
+            role:
+              type: string
+              enum: [admin, hr, payroll, employee]
+        employeeId:
+          type: string
+        department:
+          type: string
+        jobTitle:
+          type: string
+        salary:
+          type: object
+          required:
+            - basic
+          properties:
+            basic:
+              type: number
+            hra:
+              type: number
+            allowances:
+              type: number
+        bankDetails:
+          type: object
+          properties:
+            accountNumber:
+              type: string
+            ifscCode:
+              type: string
+            bankName:
+              type: string
+        dateOfJoining:
+          type: string
+          format: date
+
+    Attendance:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j1"
+        employee:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j1"
+        employeeName:
+          type: string
+          example: "Sanskruti Kukadiya"
+        date:
+          type: string
+          format: date
+          example: "2024-12-15"
+        clockIn:
+          type: string
+          format: date-time
+          example: "2024-12-15T09:00:00Z"
+        clockOut:
+          type: string
+          format: date-time
+          example: "2024-12-15T18:00:00Z"
+        totalHours:
+          type: number
+          example: 9
+        status:
+          type: string
+          enum: [present, absent, partial, late]
+          example: "present"
+        location:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Leave:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j1"
+        employee:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j1"
+        employeeName:
+          type: string
+          example: "Sanskruti Kukadiya"
+        startDate:
+          type: string
+          format: date
+          example: "2024-01-15"
+        endDate:
+          type: string
+          format: date
+          example: "2024-01-17"
+        type:
+          type: string
+          enum: [annual, sick, personal, maternity, paternity, other]
+          example: "annual"
+        reason:
+          type: string
+          example: "Family vacation"
+        status:
+          type: string
+          enum: [pending, approved, rejected, cancelled]
+          example: "approved"
+        approvedBy:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j2"
+        approvedAt:
+          type: string
+          format: date-time
+        comments:
+          type: string
+        partialDay:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Payrun:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j3"
+        month:
+          type: integer
+          example: 12
+        year:
+          type: integer
+          example: 2024
+        status:
+          type: string
+          enum: [draft, simulated, committed, cancelled]
+          example: "committed"
+        employeeCount:
+          type: integer
+          example: 50
+        totalGrossPay:
+          type: number
+          example: 2500000
+        totalDeductions:
+          type: number
+          example: 300000
+        totalNetPay:
+          type: number
+          example: 2200000
+        payslips:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payslip'
+        createdBy:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j4"
+        createdAt:
+          type: string
+          format: date-time
+        committedAt:
+          type: string
+          format: date-time
+
+    Payslip:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j5"
+        employee:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j1"
+        employeeName:
+          type: string
+          example: "Sanskruti Kukadiya"
+        payrun:
+          type: string
+          example: "64f1a2b3c4d5e6f7g8h9i0j3"
+        month:
+          type: integer
+          example: 12
+        year:
+          type: integer
+          example: 2024
+        earnings:
+          type: object
+          properties:
+            basic:
+              type: number
+              example: 50000
+            hra:
+              type: number
+              example: 25000
+            allowances:
+              type: number
+              example: 10000
+            overtime:
+              type: number
+              example: 5000
+            grossPay:
+              type: number
+              example: 90000
+        deductions:
+          type: object
+          properties:
+            pfEmployee:
+              type: number
+              example: 6000
+            professionalTax:
+              type: number
+              example: 235
+            incomeTax:
+              type: number
+              example: 5000
+            otherDeductions:
+              type: number
+              example: 1000
+            totalDeductions:
+              type: number
+              example: 12235
+        netPay:
+          type: number
+          example: 77765
+        workingDays:
+          type: integer
+          example: 22
+        presentDays:
+          type: integer
+          example: 20
+        leaveDays:
+          type: integer
+          example: 2
+        status:
+          type: string
+          enum: [generated, emailed, downloaded]
+          example: "generated"
+        generatedAt:
+          type: string
+          format: date-time
+        downloadedAt:
+          type: string
+          format: date-time
