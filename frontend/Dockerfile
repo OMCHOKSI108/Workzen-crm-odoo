@@ -1,5 +1,5 @@
-# Use Node.js LTS image
-FROM node:18-alpine
+# Multi-stage build for optimized production image
+FROM node:20-alpine as builder
 
 # Set working directory
 WORKDIR /app
@@ -8,27 +8,25 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci --prefer-offline --no-audit --progress=false
 
-# Copy application code
+# Copy source code
 COPY . .
 
 # Build the application
 RUN npm run build
 
-# Install serve for serving static files
-RUN npm install -g serve
+# Production stage
+FROM nginx:alpine
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S frontend -u 1001
+# Copy built assets from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Change ownership of the app directory
-RUN chown -R frontend:nodejs /app
-USER frontend
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port
-EXPOSE 3000
+EXPOSE 80
 
-# Serve the built application
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

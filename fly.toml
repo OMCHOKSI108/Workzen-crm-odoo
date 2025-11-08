@@ -1,0 +1,112 @@
+# 🪁 WorkZen HRMS - Fly.io Deployment Guide
+
+## Free Fly.io Deployment
+
+### 1. Install Fly CLI
+```bash
+# Windows (PowerShell)
+iwr https://fly.io/install.ps1 -useb | iex
+
+# Or download from: https://fly.io/docs/hands-on/install-flyctl/
+```
+
+### 2. Fly.io Configuration
+
+#### fly.toml
+```toml
+app = "workzen-hrms"
+primary_region = "ord"
+
+[build]
+  dockerfile = "Dockerfile.railway"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    path = "/health"
+    timeout = "5s"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"
+
+[mounts]
+  source = "data"
+  destination = "/data"
+```
+
+### 3. Deployment Commands
+```bash
+# Login to Fly.io
+fly auth login
+
+# Create app
+fly launch --copy-config --name workzen-hrms
+
+# Set secrets
+fly secrets set JWT_SECRET=your-super-secret-key-here
+fly secrets set MONGODB_URI=mongodb://your-mongodb-connection
+
+# Deploy
+fly deploy
+
+# Check status
+fly status
+
+# View logs
+fly logs
+```
+
+### 4. Add MongoDB
+```bash
+# Create Fly.io MongoDB (or use external)
+fly postgres create --name workzen-db
+
+# Or use MongoDB Atlas free tier
+# Set MONGODB_URI secret with Atlas connection string
+```
+
+### 5. Custom Domain
+```bash
+# Add custom domain
+fly certs add yourdomain.com
+
+# Check certificate status
+fly certs show yourdomain.com
+```
+
+## 💰 Fly.io Free Tier:
+- ✅ 3 shared-cpu VMs
+- ✅ 160GB bandwidth/month  
+- ✅ Global edge network
+- ✅ Always-on (no sleeping)
+- ✅ 3GB persistent storage
+
+Your app: `https://workzen-hrms.fly.dev`
