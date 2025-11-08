@@ -4,7 +4,10 @@ const Employee = require('../models/Employee');
 exports.punch = async (req, res) => {
   try {
     const { type } = req.body; // 'in' or 'out'
-    const employee = await Employee.findOne({ user: req.user._id });
+    const employee = await Employee.findOne({ 
+      user: req.user._id,
+      company: req.user.company._id
+    });
 
     if (!employee) {
       return res.status(404).json({ 
@@ -18,13 +21,15 @@ exports.punch = async (req, res) => {
 
     let attendance = await Attendance.findOne({ 
       employee: employee._id, 
-      date: today 
+      date: today,
+      company: req.user.company._id
     });
 
     if (!attendance) {
       attendance = new Attendance({ 
         employee: employee._id, 
-        date: today 
+        date: today,
+        company: req.user.company._id
       });
     }
 
@@ -63,19 +68,24 @@ exports.punch = async (req, res) => {
 exports.getAttendance = async (req, res) => {
   try {
     const { employeeId, from, to } = req.query;
-    const query = {};
+    const companyFilter = req.companyFilter || {};
+    const query = { ...companyFilter };
 
     // If employeeId is provided, find the employee first
     if (employeeId) {
-      const Employee = require('../models/Employee');
-      const employee = await Employee.findOne({ employeeId });
+      const employee = await Employee.findOne({ 
+        employeeId,
+        ...companyFilter
+      });
       if (employee) {
         query.employee = employee._id;
       }
     } else {
       // Get current user's attendance
-      const Employee = require('../models/Employee');
-      const employee = await Employee.findOne({ user: req.user._id });
+      const employee = await Employee.findOne({ 
+        user: req.user._id,
+        ...companyFilter
+      });
       if (employee) {
         query.employee = employee._id;
       }
@@ -91,19 +101,26 @@ exports.getAttendance = async (req, res) => {
     }
 
     const attendance = await Attendance.find(query)
-      .populate('employee', 'firstName lastName employeeId')
+      .populate({
+        path: 'employee',
+        match: companyFilter,
+        select: 'firstName lastName employeeId'
+      })
       .sort({ date: -1 });
     
+    // Filter out null employees (from company mismatch)
+    const filteredAttendance = attendance.filter(att => att.employee);
+    
     // Format response
-    const formattedAttendance = attendance.map(att => ({
+    const formattedAttendance = filteredAttendance.map(att => ({
       id: att._id,
       date: att.date,
       checkIn: att.inTime,
       checkOut: att.outTime,
       workHours: att.totalHours,
       status: att.status,
-      employeeName: att.employee ? `${att.employee.firstName} ${att.employee.lastName}` : 'Unknown',
-      employeeId: att.employee?.employeeId
+      employeeName: `${att.employee.firstName} ${att.employee.lastName}`,
+      employeeId: att.employee.employeeId
     }));
     
     res.json({
@@ -120,15 +137,36 @@ exports.getAttendance = async (req, res) => {
 
 exports.updateAttendance = async (req, res) => {
   try {
-    const attendance = await Attendance.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const companyFilter = req.companyFilter || {};
+    
+    const attendance = await Attendance.findOneAndUpdate(
+      { 
+        _id: req.params.id,
+        ...companyFilter
+      }, 
+      req.body, 
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    
     if (!attendance) {
-      return res.status(404).json({ message: 'Attendance not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Attendance record not found or access denied' 
+      });
     }
-    res.json(attendance);
+    
+    res.json({
+      success: true,
+      data: attendance,
+      message: 'Attendance updated successfully'
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ 
+      success: false,
+      message: error.message 
+    });
   }
 };

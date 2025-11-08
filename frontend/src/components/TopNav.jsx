@@ -1,7 +1,7 @@
 import { useAuth } from '../contexts/AuthContext';
 
 const TopNav = () => {
-  const { user, logout } = useAuth();
+  const { user, company, logout } = useAuth();
 
   return (
     <nav style={{
@@ -12,9 +12,25 @@ const TopNav = () => {
       justifyContent: 'space-between',
       alignItems: 'center'
     }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>WorkZen HRMS</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {company?.logo && (
+          <img 
+            src={company.logo} 
+            alt={`${company.name} logo`}
+            style={{ height: '32px' }}
+          />
+        )}
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
+          {company?.name || 'WorkZen'} HRMS
+        </h1>
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <span>Welcome, {user?.email}</span>
+        <div style={{ textAlign: 'right' }}>
+          <div>Welcome, {user?.name || user?.email}</div>
+          <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+            {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1) || 'Employee'}
+          </div>
+        </div>
         <button
           onClick={logout}
           style={{

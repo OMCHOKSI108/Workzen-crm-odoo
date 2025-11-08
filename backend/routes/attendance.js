@@ -1,12 +1,11 @@
 const express = require('express');
 const { punch, getAttendance, updateAttendance } = require('../controllers/attendanceController');
-const auth = require('../middleware/auth');
-const roleCheck = require('../middleware/roleCheck');
+const { rbacAuth, requireHR } = require('../middleware/rbac');
 
 const router = express.Router();
 
-router.post('/punch', auth, punch);
-router.get('/', auth, getAttendance);
-router.put('/:id', auth, roleCheck('admin', 'hr'), updateAttendance);
+router.post('/punch', rbacAuth(['attendance:write']), punch);
+router.get('/', rbacAuth(['attendance:read']), getAttendance);
+router.put('/:id', requireHR, updateAttendance);
 
 module.exports = router;

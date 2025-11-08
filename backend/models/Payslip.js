@@ -6,6 +6,11 @@ const payslipSchema = new mongoose.Schema({
     ref: 'Employee',
     required: true,
   },
+  company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true,
+  },
   payrun: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Payrun',

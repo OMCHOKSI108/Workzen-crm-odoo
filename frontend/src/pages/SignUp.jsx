@@ -109,7 +109,7 @@ export default function SignUp() {
         phone: formData.phone,
         password: formData.password,
         loginId: generatedLoginId,
-        role: 'admin' // First user is admin
+        role: 'employee' // Default role for new signups
       });
       
       if (response.data.success) {

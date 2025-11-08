@@ -21,8 +21,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'hr', 'payroll', 'employee'],
+    enum: ['super_admin', 'admin', 'hr', 'payroll', 'employee'],
     default: 'employee',
+  },
+  company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true,
   },
   permissions: {
     employees: { type: Boolean, default: false },

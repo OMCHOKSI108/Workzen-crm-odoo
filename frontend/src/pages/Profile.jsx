@@ -70,55 +70,100 @@ export default function Profile() {
     try {
       setLoading(true);
       const response = await api.get('/auth/me');
-      const employeeData = response.data.employee;
+      const userData = response.data.data.user;
+      const employeeData = response.data.data.employee;
       
+      // Set user data with fallbacks for users without employee records
       setUserData({
-        name: `${employeeData.firstName} ${employeeData.lastName}`,
-        employeeId: employeeData.employeeId,
-        email: employeeData.email,
-        phone: employeeData.phone || '',
-        dateOfBirth: employeeData.dateOfBirth || '',
-        gender: employeeData.gender || '',
-        maritalStatus: employeeData.maritalStatus || '',
-        bloodGroup: employeeData.bloodGroup || '',
+        name: employeeData ? `${employeeData.firstName} ${employeeData.lastName}` : userData.name,
+        employeeId: employeeData?.employeeId || userData.id,
+        email: employeeData?.email || userData.email,
+        phone: employeeData?.phone || '',
+        dateOfBirth: employeeData?.dateOfBirth || '',
+        gender: employeeData?.gender || '',
+        maritalStatus: employeeData?.maritalStatus || '',
+        bloodGroup: employeeData?.bloodGroup || '',
         
-        company: 'WorkZen India Pvt Ltd',
-        department: employeeData.department || '',
-        jobTitle: employeeData.jobTitle || '',
-        manager: employeeData.manager || '',
-        dateOfJoining: employeeData.dateOfJoining || '',
-        employmentType: employeeData.employmentType || 'Permanent',
-        workLocation: employeeData.workLocation || '',
+        company: employeeData?.company || 'WorkZen',
+        department: employeeData?.department || '',
+        jobTitle: employeeData?.jobTitle || '',
+        manager: employeeData?.manager || '',
+        dateOfJoining: employeeData?.dateOfJoining || '',
+        employmentType: employeeData?.employmentType || 'Permanent',
+        workLocation: employeeData?.workLocation || '',
         
-        currentAddress: employeeData.currentAddress || '',
-        permanentAddress: employeeData.permanentAddress || '',
+        currentAddress: employeeData?.currentAddress || '',
+        permanentAddress: employeeData?.permanentAddress || '',
         
-        emergencyContactName: employeeData.emergencyContactName || '',
-        emergencyContactRelation: employeeData.emergencyContactRelation || '',
-        emergencyContactPhone: employeeData.emergencyContactPhone || '',
+        emergencyContactName: employeeData?.emergencyContactName || '',
+        emergencyContactRelation: employeeData?.emergencyContactRelation || '',
+        emergencyContactPhone: employeeData?.emergencyContactPhone || '',
         
         wageType: 'Monthly',
-        basicSalary: employeeData.salary?.basic || 0,
-        hra: employeeData.salary?.hra || 0,
-        standardAllowance: employeeData.salary?.standardAllowance || 0,
-        totalSalary: employeeData.salary?.totalCTC || 0,
+        basicSalary: employeeData?.salary?.basic || 0,
+        hra: employeeData?.salary?.hra || 0,
+        standardAllowance: employeeData?.salary?.standardAllowance || 0,
+        totalSalary: employeeData?.salary?.totalCTC || 0,
         
-        bankName: employeeData.bankName || '',
-        accountNumber: employeeData.accountNumber || '',
-        ifscCode: employeeData.ifscCode || '',
-        panNumber: employeeData.panNumber || '',
+        bankName: employeeData?.bankName || '',
+        accountNumber: employeeData?.accountNumber || '',
+        ifscCode: employeeData?.ifscCode || '',
+        panNumber: employeeData?.panNumber || '',
         
-        about: employeeData.about || 'No bio added yet.',
-        skills: employeeData.skills || [],
-        certifications: employeeData.certifications || [],
+        about: employeeData?.about || 'No bio added yet.',
+        skills: employeeData?.skills || [],
+        certifications: employeeData?.certifications || [],
       });
       
-      if (employeeData.avatar) {
+      if (employeeData?.avatar) {
         setAvatarPreview(employeeData.avatar);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-      alert('Failed to load profile data');
+      
+      // If we can't fetch employee data, use user data from context
+      if (user) {
+        setUserData({
+          name: user.name || user.username,
+          employeeId: user.employeeId || user.id,
+          email: user.email,
+          phone: '',
+          dateOfBirth: '',
+          gender: '',
+          maritalStatus: '',
+          bloodGroup: '',
+          
+          company: 'WorkZen',
+          department: '',
+          jobTitle: '',
+          manager: '',
+          dateOfJoining: '',
+          employmentType: 'Permanent',
+          workLocation: '',
+          
+          currentAddress: '',
+          permanentAddress: '',
+          
+          emergencyContactName: '',
+          emergencyContactRelation: '',
+          emergencyContactPhone: '',
+          
+          wageType: 'Monthly',
+          basicSalary: 0,
+          hra: 0,
+          standardAllowance: 0,
+          totalSalary: 0,
+          
+          bankName: '',
+          accountNumber: '',
+          ifscCode: '',
+          panNumber: '',
+          
+          about: 'No bio added yet.',
+          skills: [],
+          certifications: [],
+        });
+      }
     } finally {
       setLoading(false);
     }

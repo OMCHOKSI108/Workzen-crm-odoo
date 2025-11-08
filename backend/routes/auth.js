@@ -1,11 +1,11 @@
 const express = require('express');
 const { register, login, getMe } = require('../controllers/authController');
-const auth = require('../middleware/auth');
+const { rbacAuth } = require('../middleware/rbac');
 
 const router = express.Router();
 
 router.post('/register', register);
 router.post('/login', login);
-router.get('/me', auth, getMe);
+router.get('/me', rbacAuth(['profile:read']), getMe);
 
 module.exports = router;

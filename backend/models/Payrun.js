@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const payrunSchema = new mongoose.Schema({
+  company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true,
+  },
   month: {
     type: Number,
     required: true,
@@ -44,7 +49,7 @@ const payrunSchema = new mongoose.Schema({
   },
 });
 
-// Unique index for month and year
-payrunSchema.index({ month: 1, year: 1 }, { unique: true });
+// Unique index for company, month and year
+payrunSchema.index({ company: 1, month: 1, year: 1 }, { unique: true });
 
 module.exports = mongoose.model('Payrun', payrunSchema);

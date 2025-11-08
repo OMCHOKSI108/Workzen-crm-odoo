@@ -126,14 +126,12 @@ WorkZen-HRMS/
 
 ## Application Screenshots
 
-![Dashboard](./assets/01.png)
 
 ![Employee Management](./assets/02.png)
 
 
 ![Attendance Tracking](./assets/03.png)
 
-![Payroll Processing](./assets/04.png)
 
 
 ### Dashboard Overview

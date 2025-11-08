@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 // In-memory storage for settings (in production, use a database)
 let systemSettings = {
@@ -8,7 +8,7 @@ let systemSettings = {
 };
 
 // Get current currency setting
-router.get('/currency', authenticateToken, async (req, res) => {
+router.get('/currency', auth, async (req, res) => {
   try {
     res.json({
       success: true,
@@ -24,7 +24,7 @@ router.get('/currency', authenticateToken, async (req, res) => {
 });
 
 // Update currency setting
-router.put('/currency', authenticateToken, async (req, res) => {
+router.put('/currency', auth, async (req, res) => {
   try {
     const { currency } = req.body;
 
@@ -63,7 +63,7 @@ router.put('/currency', authenticateToken, async (req, res) => {
 });
 
 // Get all system settings (for future expansion)
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     res.json({
       success: true,

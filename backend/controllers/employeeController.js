@@ -2,8 +2,15 @@ const Employee = require('../models/Employee');
 
 exports.getEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find({ isActive: true })
+    // Apply company filter automatically from RBAC middleware
+    const companyFilter = req.companyFilter || {};
+    
+    const employees = await Employee.find({ 
+      isActive: true,
+      ...companyFilter
+    })
       .populate('user', 'email role')
+      .populate('company', 'name')
       .sort({ createdAt: -1 });
     
     // Format response to match frontend structure
@@ -22,6 +29,8 @@ exports.getEmployees = async (req, res) => {
       avatar: emp.avatar,
       salary: emp.salary,
       dateOfJoining: emp.dateOfJoining,
+      company: emp.company?.name,
+      companyId: emp.company?._id,
     }));
     
     res.json({
@@ -38,38 +47,89 @@ exports.getEmployees = async (req, res) => {
 
 exports.getEmployee = async (req, res) => {
   try {
-    const employee = await Employee.findById(req.params.id).populate('user', 'email role');
+    const companyFilter = req.companyFilter || {};
+    
+    const employee = await Employee.findOne({
+      _id: req.params.id,
+      ...companyFilter
+    }).populate('user', 'email role').populate('company', 'name');
+    
     if (!employee) {
-      return res.status(404).json({ message: 'Employee not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Employee not found or access denied' 
+      });
     }
-    res.json(employee);
+    
+    res.json({
+      success: true,
+      data: employee
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error' 
+    });
   }
 };
 
 exports.createEmployee = async (req, res) => {
   try {
-    const employee = new Employee(req.body);
+    // Automatically assign company from authenticated user
+    const employeeData = {
+      ...req.body,
+      company: req.user.company._id
+    };
+    
+    const employee = new Employee(employeeData);
     await employee.save();
-    res.status(201).json(employee);
+    
+    res.status(201).json({
+      success: true,
+      data: employee,
+      message: 'Employee created successfully'
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ 
+      success: false,
+      message: error.message 
+    });
   }
 };
 
 exports.updateEmployee = async (req, res) => {
   try {
-    const employee = await Employee.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const companyFilter = req.companyFilter || {};
+    
+    const employee = await Employee.findOneAndUpdate(
+      { 
+        _id: req.params.id,
+        ...companyFilter
+      },
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    
     if (!employee) {
-      return res.status(404).json({ message: 'Employee not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Employee not found or access denied' 
+      });
     }
-    res.json(employee);
+    
+    res.json({
+      success: true,
+      data: employee,
+      message: 'Employee updated successfully'
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ 
+      success: false,
+      message: error.message 
+    });
   }
 };
 

@@ -12,6 +12,7 @@ const leaveRoutes = require('./routes/leaves');
 const payrollRoutes = require('./routes/payroll');
 const userRoutes = require('./routes/users');
 const settingsRoutes = require('./routes/settings');
+const dashboardRoutes = require('./routes/dashboard');
 
 const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
@@ -31,6 +32,7 @@ app.use('/api/leaves', leaveRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

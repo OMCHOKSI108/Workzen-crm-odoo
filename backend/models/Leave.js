@@ -6,6 +6,11 @@ const leaveSchema = new mongoose.Schema({
     ref: 'Employee',
     required: true,
   },
+  company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true,
+  },
   startDate: {
     type: Date,
     required: true,

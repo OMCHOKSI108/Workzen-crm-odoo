@@ -3,16 +3,25 @@ const Employee = require('../models/Employee');
 
 exports.getLeaves = async (req, res) => {
   try {
-    const leaves = await Leave.find()
-      .populate('employee', 'firstName lastName employeeId')
+    const companyFilter = req.companyFilter || {};
+    
+    const leaves = await Leave.find(companyFilter)
+      .populate({
+        path: 'employee',
+        match: companyFilter,
+        select: 'firstName lastName employeeId'
+      })
       .populate('approvedBy', 'email username')
       .sort({ createdAt: -1 });
     
+    // Filter out leaves with null employees (from company mismatch)
+    const filteredLeaves = leaves.filter(leave => leave.employee);
+    
     // Format response
-    const formattedLeaves = leaves.map(leave => ({
+    const formattedLeaves = filteredLeaves.map(leave => ({
       id: leave._id,
-      employeeName: leave.employee ? `${leave.employee.firstName} ${leave.employee.lastName}` : 'Unknown',
-      employeeId: leave.employee?.employeeId,
+      employeeName: `${leave.employee.firstName} ${leave.employee.lastName}`,
+      employeeId: leave.employee.employeeId,
       startDate: leave.startDate,
       endDate: leave.endDate,
       type: leave.type.charAt(0).toUpperCase() + leave.type.slice(1) + ' Leave',
@@ -37,16 +46,38 @@ exports.getLeaves = async (req, res) => {
 
 exports.getPendingLeaves = async (req, res) => {
   try {
-    const leaves = await Leave.find({ status: 'pending' }).populate('employee', 'firstName lastName');
-    res.json(leaves);
+    const companyFilter = req.companyFilter || {};
+    
+    const leaves = await Leave.find({ 
+      status: 'pending',
+      ...companyFilter
+    }).populate({
+      path: 'employee',
+      match: companyFilter,
+      select: 'firstName lastName employeeId'
+    });
+    
+    // Filter out leaves with null employees (from company mismatch)
+    const filteredLeaves = leaves.filter(leave => leave.employee);
+    
+    res.json({
+      success: true,
+      data: filteredLeaves
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error' 
+    });
   }
 };
 
 exports.createLeave = async (req, res) => {
   try {
-    const employee = await Employee.findOne({ user: req.user._id });
+    const employee = await Employee.findOne({ 
+      user: req.user._id,
+      company: req.user.company._id
+    });
     
     if (!employee) {
       return res.status(404).json({
@@ -57,7 +88,8 @@ exports.createLeave = async (req, res) => {
     
     const leave = new Leave({ 
       ...req.body, 
-      employee: employee._id 
+      employee: employee._id,
+      company: req.user.company._id
     });
     
     await leave.save();
@@ -90,6 +122,7 @@ exports.createLeave = async (req, res) => {
 exports.approveLeave = async (req, res) => {
   try {
     const { status, comments } = req.body;
+    const companyFilter = req.companyFilter || {};
     
     if (!['approved', 'rejected'].includes(status)) {
       return res.status(400).json({
@@ -98,8 +131,11 @@ exports.approveLeave = async (req, res) => {
       });
     }
     
-    const leave = await Leave.findByIdAndUpdate(
-      req.params.id,
+    const leave = await Leave.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        ...companyFilter
+      },
       {
         status,
         approvedBy: req.user._id,
@@ -107,12 +143,16 @@ exports.approveLeave = async (req, res) => {
         comments,
       },
       { new: true }
-    ).populate('employee', 'firstName lastName employeeId');
+    ).populate({
+      path: 'employee',
+      match: companyFilter,
+      select: 'firstName lastName employeeId'
+    });
     
-    if (!leave) {
+    if (!leave || !leave.employee) {
       return res.status(404).json({ 
         success: false,
-        message: 'Leave not found' 
+        message: 'Leave request not found or access denied' 
       });
     }
     
