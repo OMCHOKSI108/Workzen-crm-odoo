@@ -1,0 +1,1202 @@
+/* WorkZen HRMS - Odoo-Inspired Professional Design System */
+:root {
+  /* Odoo Purple Theme Colors */
+  --primary-color: #714B67;
+  --primary-hover: #5f3f57;
+  --primary-light: #8e6b82;
+  --primary-gradient: linear-gradient(135deg, #714B67 0%, #A64D79 100%);
+  --accent-color: #00A09D;
+  --accent-hover: #008b89;
+  
+  --danger-color: #FF6B6B;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+
+  /* Neutral Colors */
+  --white: #ffffff;
+  --gray-50: #F6F8FB;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-500: #6b7280;
+  --gray-600: #475569;
+  --gray-700: #374151;
+  --gray-800: #162329;
+  --gray-900: #1F2937;
+
+  /* Layout */
+  --sidebar-width: 220px;
+  --header-height: 60px;
+  --max-width: 100%;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-card: 10px;
+  --radius-btn: 6px;
+
+  /* Shadows - Enhanced with purple tint */
+  --shadow-card: 0 6px 18px rgba(113, 75, 103, 0.08);
+  --shadow-card-hover: 0 10px 25px rgba(113, 75, 103, 0.12);
+  --shadow-hero: 0 20px 60px rgba(113, 75, 103, 0.3);
+  --shadow-button: 0 4px 12px rgba(113, 75, 103, 0.15);
+
+  /* Typography */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+
+  /* Animation */
+  --duration-fast: 140ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--gray-50);
+  color: var(--gray-900);
+  line-height: 1.6;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* ========================================
+   KEYFRAME ANIMATIONS
+   ======================================== */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Removed complex animations - keeping only fade-in-up and fade-in */
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--gray-50);
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--gray-800);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 40;
+  padding-top: var(--spacing-lg);
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+}
+
+.sidebar-hidden {
+  transform: translateX(-100%);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--sidebar-width);
+  margin-top: var(--header-height);
+  min-height: calc(100vh - var(--header-height));
+  width: calc(100% - var(--sidebar-width));
+  overflow-x: hidden !important;
+}
+
+.page-content {
+  flex: 1;
+  background-color: var(--gray-50);
+  width: 100%;
+  padding-top: 0 !important;
+  overflow-x: hidden !important;
+}
+
+/* Header Styles */
+.header {
+  height: var(--header-height);
+  background: var(--primary-gradient);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-lg);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  box-shadow: 0 2px 8px rgba(113, 75, 103, 0.15);
+}
+
+.header-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.welcome {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.95);
+  margin-right: 1rem;
+}
+
+/* Sidebar Styles */
+.brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 0 var(--spacing-md) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: left;
+}
+
+.side-nav {
+  flex: 1;
+  padding: 0 var(--spacing-md);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  padding: 0.75rem var(--spacing-md);
+  border-radius: var(--radius-btn);
+  margin-bottom: 0.25rem;
+  transition: all var(--duration-fast) var(--ease-smooth);
+  font-size: 0.95rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: all var(--duration-normal) var(--ease-smooth);
+  transform: translateX(-50%);
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.nav-item:hover::after {
+  width: 80%;
+}
+
+.nav-item.active {
+  background: var(--primary-gradient);
+  color: white;
+  font-weight: 500;
+}
+
+.nav-item.active::after {
+  width: 0;
+}
+
+.nav-item .label {
+  display: block;
+  font-size: var(--font-size-base);
+}
+
+/* Button Styles - Odoo Gradient Enhanced */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-btn);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: var(--shadow-button);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(113, 75, 103, 0.25);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.btn-success:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.25);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #FF6B6B 0%, #e85555 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.15);
+}
+
+.btn-danger:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 107, 107, 0.25);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  border: 1px solid var(--gray-300);
+  color: var(--gray-900);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--gray-100);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-lg {
+  padding: 0.875rem 1.25rem;
+  font-size: 1rem;
+  min-width: 140px;
+  height: 56px;
+  border-radius: 28px;
+}
+
+/* Form Styles */
+.form-field {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-700);
+  margin-bottom: 0.375rem;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea,
+.input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-card);
+  font-size: 0.875rem;
+  background-color: white;
+  transition: border-color 0.15s ease;
+  font-family: inherit;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.form-field textarea,
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+/* Card Styles - Enhanced Odoo Style */
+.card {
+  background-color: white;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(113, 75, 103, 0.06);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: scale(1.01);
+  border-color: rgba(113, 75, 103, 0.12);
+}
+
+.card-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-500);
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* Stat Card Styles - Odoo Enhanced */
+.stat-card {
+  background-color: white;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(113, 75, 103, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+/* Grid Layouts */
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Container Styles */
+/* FIXED: Full width, no side gaps */
+.app-container,
+.container,
+.content-wrap,
+.page-content-inner {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 var(--spacing-lg) !important; /* keeps inner spacing */
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--gray-900);
+}
+
+h1 { font-size: 1.875rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+
+p {
+  margin: 0 0 0.75rem 0;
+  line-height: 1.6;
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+
+/* Punch Actions */
+.punch-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .sidebar {
+    position: static;
+    transform: translateX(0);
+  }
+
+  .toggle-sidebar-btn {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar-open {
+    transform: translateX(0);
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+
+  .grid-cols-2,
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    padding: 0 1rem;
+  }
+
+  .punch-actions {
+    flex-direction: column;
+  }
+}
+
+/* Additional Components */
+.toggle-sidebar-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ========================================
+   HERO SECTION - Odoo Style Edge-to-Edge
+   ======================================== */
+
+.hero {
+  position: relative;
+  width: 100vw !important;
+  margin-left: calc(-1 * var(--spacing-lg)) !important;
+  margin-right: calc(-1 * var(--spacing-lg)) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  height: clamp(420px, 60vh, 720px);
+  min-height: 420px;
+  max-height: 720px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(113, 75, 103, 0.95) 0%, rgba(91, 60, 82, 0.97) 100%),
+              url('/images/Web-design.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  color: white;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(113, 75, 103, 0.3) 0%, rgba(166, 77, 121, 0.2) 100%);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+}
+
+.hero-headline {
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 800;
+  margin: 0 0 12px 0;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+.hero-subheading {
+  font-size: clamp(14px, 1.6vw, 18px);
+  margin: 0 0 20px 0;
+  opacity: 0.95;
+  line-height: 1.5;
+  font-weight: 400;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 12px 28px;
+  background: var(--primary-gradient);
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 40px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(113, 75, 103, 0.3);
+  text-decoration: none;
+}
+
+.hero-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(113, 75, 103, 0.4);
+}
+
+.hero-cta:active {
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   CONTENT WRAPPER & SECTIONS - Odoo Style
+   ======================================== */
+
+.content-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 2.5rem var(--spacing-lg) !important; /* Odoo uses generous top/bottom padding */
+}
+
+.page-content-inner {
+  max-width: 1400px; /* Odoo uses wider max-width for content */
+  margin: 0 auto;
+  padding: 2rem var(--spacing-xl);
+  width: 100%;
+}
+
+.page-section {
+  margin-bottom: 3rem; /* More spacing like Odoo */
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+/* ========================================
+   STATS GRID & ANIMATED CARDS - Odoo Style
+   ======================================== */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem; /* Odoo uses larger gaps */
+  margin-bottom: 3rem; /* More bottom spacing */
+  padding: 0 1rem;
+}
+
+.animated-card {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.45s var(--ease-smooth), transform 0.45s var(--ease-smooth);
+}
+
+.animated-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animated-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.stats-grid .animated-card:nth-child(1) { transition-delay: 0ms; }
+.stats-grid .animated-card:nth-child(2) { transition-delay: 60ms; }
+.stats-grid .animated-card:nth-child(3) { transition-delay: 120ms; }
+.stats-grid .animated-card:nth-child(4) { transition-delay: 180ms; }
+.stats-grid .animated-card:nth-child(5) { transition-delay: 240ms; }
+.stats-grid .animated-card:nth-child(6) { transition-delay: 300ms; }
+
+/* ========================================
+   ENHANCED PUNCH BUTTONS - Balanced Size
+   ======================================== */
+
+.punch-actions {
+  display: flex;
+  gap: 28px;
+  margin: 24px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.punch-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  border: none;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  overflow: hidden;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.punch-btn:hover {
+  opacity: 0.9;
+}
+
+.punch-btn:active {
+  opacity: 0.8;
+}
+
+.punch-btn:active {
+  transform: scale(0.98);
+}
+
+.punch-btn.punch-in {
+  background: linear-gradient(135deg, #16A34A 0%, #15803d 100%);
+}
+
+.punch-btn.punch-out {
+  background: linear-gradient(135deg, #EF4444 0%, #dc2626 100%);
+}
+
+.punch-icon {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
+  animation: ripple 600ms ease-out;
+  pointer-events: none;
+}
+
+/* Status Badge with Pulse */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-card);
+  margin-top: 1rem;
+}
+
+.status-badge.active {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--success-color);
+}
+
+.status-indicator.out {
+  background-color: var(--danger-color);
+}
+
+/* ========================================
+   PAGE SECTION ANIMATIONS
+   ======================================== */
+
+.page-section {
+  opacity: 0;
+  animation: fade-in-up 0.6s var(--ease-smooth) forwards;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+/* ========================================
+   ENHANCED FORM INPUTS
+   ======================================== */
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(36, 107, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Print Styles */
+@media print {
+  .header,
+  .sidebar,
+  .btn,
+  .toggle-sidebar-btn,
+  .hero {
+    display: none !important;
+  }
+
+  .page-content {
+    padding: 0;
+    max-width: 780px;
+  }
+
+  .app-container {
+    padding: 0;
+  }
+
+  body {
+    background-color: white !important;
+  }
+
+  .card {
+    box-shadow: none;
+    border: none;
+    page-break-inside: avoid;
+  }
+
+  .app-shell {
+    display: block;
+  }
+
+  /* Main content becomes full-width; inner content is padded instead */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 0; /* removed left margin so content is edge-to-edge */
+  margin-top: var(--header-height);
+  min-height: calc(100vh - var(--header-height));
+  width: 100%;
+  position: relative;
+}
+
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* ========================================
+   RESPONSIVE DESIGN - Professional
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero {
+    height: clamp(380px, 55vh, 650px);
+  }
+
+  .sidebar {
+    width: 200px;
+  }
+
+  .main-content {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar-open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .hero {
+    height: clamp(340px, 50vh, 520px);
+  }
+
+  .hero-headline {
+    font-size: clamp(24px, 6vw, 36px);
+  }
+
+  .hero-subheading {
+    font-size: clamp(13px, 2vw, 16px);
+  }
+
+  .hero-cta {
+    padding: 10px 22px;
+    font-size: 0.9375rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .punch-btn {
+    width: 120px;
+    height: 120px;
+    font-size: 0.9375rem;
+  }
+
+  .punch-icon {
+    font-size: 1.75rem;
+  }
+
+ /* Inner wrapper gets left padding equal to sidebar width on large screens.
+   This allows hero/backgrounds to be full-bleed while the readable content
+   sits after the sidebar. */
+.page-content-inner {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-lg);
+  padding-left: calc(var(--sidebar-width) + var(--spacing-lg));
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+  .header {
+    padding: 0 var(--spacing-md);
+  }
+
+  .toggle-sidebar-btn {
+    display: flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .punch-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .punch-btn {
+    width: 110px;
+    height: 110px;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY - REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animated-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .punch-btn {
+    transition: none;
+  }
+
+  .fade-in-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ========================================
+   TOGGLE BUTTON ROTATION
+   ======================================== */
+
+.toggle-sidebar-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+.sidebar-open .toggle-sidebar-btn {
+  transform: rotate(90deg);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ========================================
+   ADDITIONAL ENHANCEMENTS
+   ======================================== */
+
+.page-banner {
+  position: relative;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.page-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-gradient);
+  opacity: 0.9;
+}
+
+.page-banner-content {
+  position: relative;
+  z-index: 2;
+  color: white;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.page-banner h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: white;
+}
+
+/* Company Logo */
+.company-logo {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+/* Slide-in animation for simulation results */
+.simulation-result {
+  animation: slide-in-right 0.5s var(--ease-smooth);
+}
+
+/* Flip animation for payroll cards */
+.flip-card {
+  animation: flip-in 0.6s var(--ease-smooth);
+}
+
+/* Toast notification (optional) */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card-hover);
+  z-index: 10000;
+  animation: slide-in-right 0.3s var(--ease-smooth);
+}
+
+.toast.success {
+  border-left: 4px solid var(--success-color);
+}
+
+.toast.error {
+  border-left: 4px solid var(--danger-color);
+}
+
+/* ========================================
+   KILL ALL SIDE GAPS - ODOO EDGE-TO-EDGE FIX
+   ======================================== */
+body, 
+.app-shell, 
+.main-content, 
+.page-content {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Hero and Overview sections - full width */
+.hero,
+.page-banner {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+}
+
