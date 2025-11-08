@@ -1,0 +1,34 @@
+# Render.com deployment configuration
+services:
+  # Backend Web Service
+  - type: web
+    name: workzen-backend
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000
+    healthCheckPath: /api/health
+    
+  # Frontend Static Site
+  - type: web
+    name: workzen-frontend  
+    runtime: static
+    plan: free
+    region: oregon
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    
+# PostgreSQL Database (free tier)
+databases:
+  - name: workzen-database
+    plan: free
+    databaseName: workzen_hrms
+    user: workzen_user
