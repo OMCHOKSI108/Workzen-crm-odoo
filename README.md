@@ -124,15 +124,9 @@ WorkZen-HRMS/
 └── README.md
 ```
 
-## Application Screenshots
-
-
-![Employee Management](./assets/02.png)
-
-
-![Attendance Tracking](./assets/03.png)
-
-
+LINK : 
+BACKEND : https://workzen-crm-odoo.onrender.com
+FRONTEND : https://workzen-crm.vercel.app
 
 ### Dashboard Overview
 ![Dashboard](./assets/01.png)
