@@ -126,6 +126,16 @@ WorkZen-HRMS/
 
 ## Application Screenshots
 
+![Dashboard](./assets/01.png)
+
+![Employee Management](./assets/02.png)
+
+
+![Attendance Tracking](./assets/03.png)
+
+![Payroll Processing](./assets/04.png)
+
+
 ### Dashboard Overview
 ![Dashboard](./assets/01.png)
 
@@ -167,130 +177,6 @@ WorkZen-HRMS/
 - **Payroll Officer**: Payroll processing and financial reports
 - **Employee**: Personal attendance, leave requests, payslip access
 
-## Installation and Setup
-
-### Prerequisites
-- Node.js 18 or higher
-- MongoDB (local or MongoDB Atlas)
-- Docker and Docker Compose (optional)
-
-### Local Development
-```bash
-# Clone the repository
-git clone <repository-url>
-cd WorkZen-HRMS
-
-# Install backend dependencies
-cd backend
-npm install
-
-# Install frontend dependencies
-cd ../frontend
-npm install
-
-# Set up environment variables
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-
-# Start MongoDB (if using local instance)
-mongod
-
-# Start backend server
-cd backend
-npm start
-
-# Start frontend server
-cd frontend
-npm run dev
-```
-
-### Docker Deployment
-```bash
-# Run with Docker Compose
-docker-compose up -d
-
-# Initialize database with seed data
-docker exec -it workzen-backend node scripts/seedDatabase.js
-```
-
-## API Endpoints
-
-### Authentication
-- POST `/api/auth/login` - User login
-- POST `/api/auth/register` - User registration
-- GET `/api/auth/me` - Get current user
-
-### Employees
-- GET `/api/employees` - Get all employees
-- POST `/api/employees` - Create new employee
-- PUT `/api/employees/:id` - Update employee
-- DELETE `/api/employees/:id` - Delete employee
-
-### Attendance
-- GET `/api/attendance` - Get attendance records
-- POST `/api/attendance` - Record attendance
-- PUT `/api/attendance/:id` - Update attendance
-
-### Leaves
-- GET `/api/leaves` - Get leave requests
-- POST `/api/leaves` - Create leave request
-- PUT `/api/leaves/:id` - Update leave status
-
-### Payroll
-- GET `/api/payroll` - Get payroll records
-- POST `/api/payroll` - Process payroll
-- GET `/api/payroll/:id/payslip` - Generate payslip
-
-### Settings
-- GET `/api/settings` - Get system settings
-- PUT `/api/settings/currency` - Update currency settings
-
-## Database Schema
-
-### Collections
-- **users**: System users with authentication
-- **employees**: Employee profiles and information
-- **attendance**: Daily attendance records
-- **leaves**: Leave requests and approvals
-- **payroll**: Salary calculations and payslips
-- **settings**: System configuration and preferences
-
-## Deployment
-
-The application supports multiple deployment strategies:
-
-### Cloud Deployment
-- **Frontend**: Vercel or Netlify
-- **Backend**: Render, Heroku, or DigitalOcean
-- **Database**: MongoDB Atlas
-
-### Container Deployment
-- Docker Hub registry
-- AWS ECS or Google Cloud Run
-- Kubernetes clusters
-
-### Traditional Hosting
-- VPS or dedicated servers
-- PM2 process management
-- Nginx reverse proxy
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.
-
 ## Author
 
 **Om Choksi**  
-Developed for Odoo Hackathon IIT Gandhinagar
-
-## Support
-
-For issues and questions, please contact the development team or create an issue in the repository.
