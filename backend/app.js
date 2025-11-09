@@ -26,6 +26,7 @@ const corsOptions = {
     'https://workzen-5if8c7a3e-om-choksi-s-projects.vercel.app',
     'https://workzen-lmn1xwpdc-om-choksi-s-projects.vercel.app',
     'https://workzen-5q7l7zc13-om-choksi-s-projects.vercel.app',
+    'https://workzen-x9wniy7pa-om-choksi-s-projects.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000'
   ],
