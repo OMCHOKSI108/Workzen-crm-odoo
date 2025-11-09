@@ -1,6 +1,30 @@
 # WorkZen HRMS
 
-## Odoo Hackathon IIT Gandhinagar
+## 🚀 **Live Application**
+
+### **Frontend (Vercel):** https://workzen-crm.vercel.app
+### **Backend API (Render):** https://workzen-crm-odoo.onrender.com
+### **API Documentation:** https://workzen-crm-odoo.onrender.com (visit root for endpoint details)
+
+---
+
+## 🎯 **Quick Start**
+
+1. **Visit the live app:** https://workzen-crm.vercel.app
+2. **Register your company** or use demo credentials
+3. **Explore features:** Employee management, attendance tracking, leave management, payroll
+
+---
+
+## 🏗️ **Architecture**
+
+- **Frontend:** React + Vite deployed on **Vercel**
+- **Backend:** Node.js + Express deployed on **Render**
+- **Database:** MongoDB Atlas (cloud)
+- **Authentication:** JWT with role-based access control
+- **Multi-tenant:** Company-scoped data isolation
+
+---
 
 ### Problem Description
 
@@ -127,6 +151,26 @@ WorkZen-HRMS/
 LINK : 
 BACKEND : https://workzen-crm-odoo.onrender.com
 FRONTEND : https://workzen-crm.vercel.app
+
+## 🌐 **Deployment Information**
+
+### **Frontend (Vercel)**
+- **URL:** https://workzen-crm.vercel.app
+- **Technology:** React + Vite
+- **Features:** Server-side rendering, global CDN, automatic HTTPS
+- **Build:** Automatic deployment from Git pushes
+
+### **Backend (Render)**
+- **URL:** https://workzen-crm-odoo.onrender.com
+- **Technology:** Node.js + Express
+- **Database:** MongoDB Atlas
+- **Features:** Auto-deploy, health checks, environment variables
+- **CORS:** Configured for frontend domain
+
+### **API Endpoints**
+Visit the backend URL for complete API documentation with all available endpoints, authentication requirements, and response formats.
+
+---
 
 ### Dashboard Overview
 ![Dashboard](./assets/01.png)

@@ -20,7 +20,19 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'https://workzen-crm.vercel.app',
+    'https://workzen-5if8c7a3e-om-choksi-s-projects.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(requestLogger);
 
@@ -36,7 +48,74 @@ app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK' });
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// API Documentation Root
+app.get('/', (req, res) => {
+  res.json({
+    name: 'WorkZen HRMS API',
+    version: '1.0.0',
+    description: 'Multi-tenant Human Resource Management System API',
+    frontend_url: 'https://workzen-crm.vercel.app',
+    endpoints: {
+      authentication: {
+        'POST /api/auth/register': 'Register new user and company',
+        'POST /api/auth/login': 'User login',
+        'GET /api/auth/me': 'Get current user profile'
+      },
+      dashboard: {
+        'GET /api/dashboard/stats': 'Get dashboard statistics',
+        'GET /api/dashboard/activity': 'Get recent activity'
+      },
+      employees: {
+        'GET /api/employees': 'Get all employees (company-scoped)',
+        'POST /api/employees': 'Create new employee',
+        'GET /api/employees/:id': 'Get employee by ID',
+        'PUT /api/employees/:id': 'Update employee',
+        'DELETE /api/employees/:id': 'Delete employee'
+      },
+      attendance: {
+        'GET /api/attendance': 'Get attendance records',
+        'POST /api/attendance/punch': 'Punch in/out',
+        'GET /api/attendance/:employeeId': 'Get attendance by employee'
+      },
+      leaves: {
+        'GET /api/leaves': 'Get leave requests',
+        'POST /api/leaves': 'Create leave request',
+        'GET /api/leaves/pending': 'Get pending leave requests',
+        'POST /api/leaves/:id/approve': 'Approve/reject leave'
+      },
+      payroll: {
+        'GET /api/payroll': 'Get payroll records',
+        'POST /api/payroll/run': 'Run payroll',
+        'GET /api/payroll/:id': 'Get payroll by ID'
+      }
+    },
+    features: [
+      'Multi-tenant architecture',
+      'Role-based access control (RBAC)',
+      'Company-scoped data isolation',
+      'JWT authentication',
+      'RESTful API design',
+      'MongoDB database',
+      'CORS enabled for frontend'
+    ],
+    cors_origins: [
+      'https://workzen-crm.vercel.app',
+      'https://workzen-5if8c7a3e-om-choksi-s-projects.vercel.app'
+    ]
+  });
+});
+
+// API Info
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'WorkZen HRMS API is running',
+    version: '1.0.0',
+    endpoints: '/api/health for health check',
+    documentation: 'Visit root (/) for full API documentation'
+  });
 });
 
 // Error handling
