@@ -2,7 +2,7 @@
 
 ## 🚀 **Live Application**
 
-### **Frontend (Vercel):** https://workzen-crm.vercel.app
+### **Frontend (Vercel):** https://workzen-fmegwl21x-om-choksi-s-projects.vercel.app
 ### **Backend API (Render):** https://workzen-crm-odoo.onrender.com
 ### **API Documentation:** https://workzen-crm-odoo.onrender.com (visit root for endpoint details)
 
@@ -10,7 +10,7 @@
 
 ## 🎯 **Quick Start**
 
-1. **Visit the live app:** https://workzen-crm.vercel.app
+1. **Visit the live app:** https://workzen-fmegwl21x-om-choksi-s-projects.vercel.app
 2. **Register your company** or use demo credentials
 3. **Explore features:** Employee management, attendance tracking, leave management, payroll
 
