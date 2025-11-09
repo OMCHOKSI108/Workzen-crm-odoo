@@ -7,9 +7,22 @@ const PDFDocument = require('pdfkit');
 exports.simulatePayrun = async (req, res) => {
   try {
     const { month, year } = req.body;
-    const employees = await Employee.find({ isActive: true });
+    const companyFilter = req.companyFilter || {};
+    
+    const employees = await Employee.find({ 
+      ...companyFilter,
+      isActive: true 
+    });
+
+    if (employees.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No active employees found in your company. Please add employees before running payroll.'
+      });
+    }
 
     const payrunData = {
+      ...companyFilter,
       month,
       year,
       employees: employees.map(emp => ({
@@ -28,9 +41,16 @@ exports.simulatePayrun = async (req, res) => {
     const payrun = new Payrun({ ...payrunData, status: 'simulated' });
     await payrun.save();
 
-    res.json(payrun);
+    res.json({
+      success: true,
+      data: payrun,
+      message: 'Payroll simulation completed successfully'
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Unable to simulate payroll. Please check your employee data and try again.' 
+    });
   }
 };
 
@@ -82,10 +102,36 @@ exports.getPayrun = async (req, res) => {
 
 exports.getPayslips = async (req, res) => {
   try {
-    const payslips = await Payslip.find().populate('employee', 'firstName lastName employeeId').populate('payrun', 'month year');
-    res.json(payslips);
+    const companyFilter = req.companyFilter || {};
+    
+    const payslips = await Payslip.find(companyFilter)
+      .populate({
+        path: 'employee',
+        match: companyFilter,
+        select: 'firstName lastName employeeId'
+      })
+      .populate('payrun', 'month year');
+    
+    // Filter out payslips with null employees (from company mismatch)
+    const filteredPayslips = payslips.filter(slip => slip.employee);
+    
+    if (filteredPayslips.length === 0) {
+      return res.json({
+        success: true,
+        data: [],
+        message: 'No payslips found for your company. Generate payroll to create payslips.'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: filteredPayslips
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Unable to retrieve payslip data. Please try again later.' 
+    });
   }
 };
 
@@ -217,13 +263,32 @@ exports.downloadPayslipPDF = async (req, res) => {
 
 exports.getAnalytics = async (req, res) => {
   try {
-    const employees = await Employee.find({ isActive: true });
-    const attendance = await Attendance.find();
-    const leaves = await require('../models/Leave').find();
+    const companyFilter = req.companyFilter || {};
+    
+    const employees = await Employee.find({ 
+      ...companyFilter,
+      isActive: true 
+    });
+    
+    const attendance = await Attendance.find(companyFilter);
+    const leaves = await require('../models/Leave').find(companyFilter);
+    
+    // Check if there's any data for this company
+    if (employees.length === 0) {
+      return res.json({
+        success: true,
+        data: {
+          monthlyData: [],
+          payrollReports: [],
+          employees: []
+        },
+        message: 'No employee data found. Please add employees to see analytics.'
+      });
+    }
     
     // Calculate monthly employee count and payroll amount
     const monthlyData = [];
-    const months = ['January', 'February', 'March', 'April', 'May', 'June'];
+    const months = ['June', 'July', 'August', 'September', 'October', 'November'];
     
     for (let i = 0; i < 6; i++) {
       const monthCount = employees.length; // In real scenario, filter by month
@@ -246,7 +311,7 @@ exports.getAnalytics = async (req, res) => {
       gross: emp.salary?.basic + (emp.salary?.hra || 0) + (emp.salary?.standardAllowance || 0),
       deductions: (emp.salary?.pf || 0) + (emp.salary?.professionalTax || 0),
       net: 0,
-      status: 'Paid'
+      status: 'Pending'
     }));
     
     // Calculate net
@@ -272,7 +337,7 @@ exports.getAnalytics = async (req, res) => {
     console.error('Analytics error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Unable to load analytics data. Please try again later.'
     });
   }
 };

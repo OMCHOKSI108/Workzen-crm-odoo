@@ -8,7 +8,6 @@ export default function Attendance() {
   const [status, setStatus] = useState('out'); // 'in' or 'out'
   const [attendanceHistory, setAttendanceHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchAttendanceHistory();
@@ -17,7 +16,6 @@ export default function Attendance() {
   const fetchAttendanceHistory = async () => {
     try {
       setLoading(true);
-      setError(null);
       const response = await api.get('/attendance');
       if (response.data.success) {
         const formattedHistory = response.data.data.map(att => ({
@@ -39,7 +37,6 @@ export default function Attendance() {
       }
     } catch (error) {
       console.error('Error fetching attendance:', error);
-      setError(error.response?.data?.message || 'Unable to load attendance data. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -59,22 +56,14 @@ export default function Attendance() {
       }
     } catch (error) {
       console.error('Punch error:', error);
-      alert(error.response?.data?.message || 'Failed to record attendance. Please try again.');
+      alert(error.response?.data?.message || 'Failed to record attendance');
     }
   }
 
   if (loading) {
     return (
-      <div className="content-wrap">
-        <h1 style={{ marginBottom: '2rem', fontSize: '2rem', fontWeight: 600 }}>Attendance</h1>
-        <div style={{ 
-          padding: '3rem', 
-          textAlign: 'center',
-          fontSize: '1.125rem',
-          color: '#6b7280' 
-        }}>
-          🔄 Loading attendance data...
-        </div>
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <p>Loading attendance data...</p>
       </div>
     );
   }
@@ -86,36 +75,6 @@ export default function Attendance() {
   return (
     <div className="content-wrap">
       <h1 style={{ marginBottom: '2rem', fontSize: '2rem', fontWeight: 600 }}>Attendance</h1>
-
-      {error && (
-        <div style={{
-          backgroundColor: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '8px',
-          padding: '1rem',
-          marginBottom: '2rem',
-          textAlign: 'center'
-        }}>
-          <p style={{ color: '#dc2626', margin: 0 }}>
-            ⚠️ {error}
-          </p>
-          <button 
-            onClick={fetchAttendanceHistory}
-            style={{
-              marginTop: '0.5rem',
-              backgroundColor: '#dc2626',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '0.5rem 1rem',
-              fontSize: '0.875rem',
-              cursor: 'pointer'
-            }}
-          >
-            🔄 Retry
-          </button>
-        </div>
-      )}
 
       {/* Employee ID & Status Card */}
       <div className="card" style={{ marginBottom: '1.5rem' }}>
@@ -141,74 +100,78 @@ export default function Attendance() {
                 borderRadius: '20px',
                 backgroundColor: status === 'in' ? '#10b98120' : '#ef444420',
                 color: status === 'in' ? 'var(--success-color)' : 'var(--danger-color)',
-                fontSize: '0.875rem',
-                fontWeight: 600,
+                fontWeight: 700,
+                fontSize: '1rem',
               }}
             >
-              <span style={{ fontSize: '1rem' }}>
-                {status === 'in' ? '🟢' : '🔴'}
-              </span>
+              <div
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  backgroundColor: status === 'in' ? 'var(--success-color)' : 'var(--danger-color)',
+                }}
+              />
               {status === 'in' ? 'Checked In' : 'Checked Out'}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Punch In/Out Buttons */}
-      <div className="card" style={{ marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '1.125rem', marginBottom: '1rem', fontWeight: 600 }}>
-          Time Clock
-        </h3>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <button
-            className="btn btn-success"
-            onClick={() => handlePunch('in')}
-            disabled={status === 'in'}
-            style={{
-              flex: 1,
-              minWidth: '150px',
-              padding: '1rem',
-              fontSize: '1.125rem',
-              fontWeight: 600,
-              opacity: status === 'in' ? 0.6 : 1,
-              cursor: status === 'in' ? 'not-allowed' : 'pointer',
-            }}
-          >
-            🕐 Check In
-          </button>
-          <button
-            className="btn btn-danger"
-            onClick={() => handlePunch('out')}
-            disabled={status === 'out'}
-            style={{
-              flex: 1,
-              minWidth: '150px',
-              padding: '1rem',
-              fontSize: '1.125rem',
-              fontWeight: 600,
-              opacity: status === 'out' ? 0.6 : 1,
-              cursor: status === 'out' ? 'not-allowed' : 'pointer',
-            }}
-          >
-            🕐 Check Out
-          </button>
-        </div>
-        {lastPunch && (
-          <div style={{
-            marginTop: '1rem',
-            padding: '1rem',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '6px',
-            fontSize: '0.875rem',
-          }}>
-            <strong>Last Action:</strong> {lastPunch.type === 'in' ? 'Checked In' : 'Checked Out'} at{' '}
-            {new Date(lastPunch.timestamp).toLocaleTimeString()}
-            {lastPunch.workHours > 0 && (
-              <span> | Work Hours: <strong>{lastPunch.workHours} hrs</strong></span>
-            )}
-          </div>
-        )}
+      {/* Punch Buttons */}
+      <div className="punch-actions">
+        <button
+          className="punch-btn punch-in"
+          onClick={() => handlePunch('IN')}
+          aria-label="Punch in for the day"
+          disabled={status === 'in'}
+          style={{
+            opacity: status === 'in' ? 0.5 : 1,
+            cursor: status === 'in' ? 'not-allowed' : 'pointer',
+          }}
+        >
+          <span className="punch-icon" aria-hidden="true">
+            🕐
+          </span>
+          <span>Check In</span>
+        </button>
+
+        <button
+          className="punch-btn punch-out"
+          onClick={() => handlePunch('OUT')}
+          aria-label="Punch out for the day"
+          disabled={status === 'out'}
+          style={{
+            opacity: status === 'out' ? 0.5 : 1,
+            cursor: status === 'out' ? 'not-allowed' : 'pointer',
+          }}
+        >
+          <span className="punch-icon" aria-hidden="true">
+            🕐
+          </span>
+          <span>Check Out</span>
+        </button>
       </div>
+
+      {/* Last Punch Timestamp */}
+      {lastPunch && (
+        <div
+          className="card"
+          style={{
+            marginTop: '1.5rem',
+            textAlign: 'center',
+            backgroundColor: lastPunch.type === 'IN' ? '#10b98110' : '#ef444410',
+            border: `2px solid ${lastPunch.type === 'IN' ? 'var(--success-color)' : 'var(--danger-color)'}`,
+          }}
+        >
+          <div style={{ fontSize: '0.875rem', color: 'var(--gray-700)', marginBottom: '0.5rem' }}>
+            Last {lastPunch.type === 'IN' ? 'Check In' : 'Check Out'}
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--gray-900)' }}>
+            {lastPunch.timestamp}
+          </div>
+        </div>
+      )}
 
       {/* Attendance History Table */}
       <div className="card" style={{ marginTop: '2rem' }}>
@@ -226,7 +189,7 @@ export default function Attendance() {
             <h4 style={{ fontSize: '1.125rem', marginBottom: '0.5rem', color: '#374151' }}>
               No Attendance Records Yet
             </h4>
-            <p style={{ marginBottom: '1.5rem', maxWidth: '400px', margin: '0 auto 1.5rem' }}>
+            <p style={{ marginBottom: '1.5rem', maxWidth: '400px', margin: '0 auto' }}>
               Your attendance history will appear here once you start checking in and out. 
               Use the buttons above to record your first attendance.
             </p>
@@ -339,6 +302,106 @@ export default function Attendance() {
                     </td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+            <thead>
+              <tr style={{ borderBottom: '2px solid var(--gray-200)' }}>
+                <th
+                  style={{
+                    padding: '0.75rem',
+                    textAlign: 'left',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: 'var(--gray-700)',
+                  }}
+                >
+                  Date
+                </th>
+                <th
+                  style={{
+                    padding: '0.75rem',
+                    textAlign: 'left',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: 'var(--gray-700)',
+                  }}
+                >
+                  Check In
+                </th>
+                <th
+                  style={{
+                    padding: '0.75rem',
+                    textAlign: 'left',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: 'var(--gray-700)',
+                  }}
+                >
+                  Check Out
+                </th>
+                <th
+                  style={{
+                    padding: '0.75rem',
+                    textAlign: 'left',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: 'var(--gray-700)',
+                  }}
+                >
+                  Work Hours
+                </th>
+                <th
+                  style={{
+                    padding: '0.75rem',
+                    textAlign: 'left',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: 'var(--gray-700)',
+                  }}
+                >
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {attendanceHistory.map((record) => (
+                <tr key={record.id} style={{ borderBottom: '1px solid var(--gray-200)' }}>
+                  <td style={{ padding: '0.75rem', fontSize: '0.875rem', fontWeight: 500 }}>
+                    {record.date}
+                  </td>
+                  <td style={{ padding: '0.75rem', fontSize: '0.875rem' }}>{record.checkIn}</td>
+                  <td style={{ padding: '0.75rem', fontSize: '0.875rem' }}>{record.checkOut}</td>
+                  <td style={{ padding: '0.75rem', fontSize: '0.875rem', fontWeight: 600 }}>
+                    {record.workHours}
+                  </td>
+                  <td style={{ padding: '0.75rem' }}>
+                    <span
+                      style={{
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '12px',
+                        backgroundColor:
+                          record.status === 'Present'
+                            ? '#10b98120'
+                            : record.status === 'Leave'
+                            ? '#f59e0b20'
+                            : '#ef444420',
+                        color:
+                          record.status === 'Present'
+                            ? 'var(--success-color)'
+                            : record.status === 'Leave'
+                            ? 'var(--warning-color)'
+                            : 'var(--danger-color)',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                      }}
+                    >
+                      {record.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
               </tbody>
             </table>
           </div>

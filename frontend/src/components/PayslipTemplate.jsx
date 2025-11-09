@@ -1,38 +1,56 @@
 import React from 'react';
 
 export default function PayslipTemplate({ payslip, currency = 'USD' }) {
-  const data = payslip || {
-    month: 'November 2025',
-    employeeId: 'EMP001',
-    name: 'Sanskruti Kukadiya',
-    designation: 'Software Engineer',
-    department: 'Engineering',
-    joinDate: '2023-01-15',
-    bankAccount: '**** **** **** 1234',
-    panNumber: 'ABCDE1234F',
-    gstin: '22AAAAA0000A1Z5', // Company GSTIN
-    employeeType: 'permanent', // 'permanent' or 'contractor'
-    earnings: { 
-      'Basic Salary': 50000, 
-      'House Rent Allowance': 15000, 
-      'Dearness Allowance': 5000,
-      'Transport Allowance': 3000,
-      'Medical Allowance': 2500,
-      'Special Allowance': 2500,
-      'Overtime': 2000
-    },
-    deductions: { 
-      'Provident Fund (12%)': 6000, 
-      'Employee State Insurance': 750,
-      'Income Tax (TDS)': 8500,
-      'Professional Tax': 200,
-      'Health Insurance': 1500
-    },
-    workingDays: 22,
-    presentDays: 21,
-    totalLeaves: 1,
-    lop: 0 // Loss of Pay days
-  };
+  // If no payslip data provided, show empty state
+  if (!payslip) {
+    return (
+      <div style={{
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        maxWidth: '800px',
+        margin: '0 auto',
+        backgroundColor: 'white',
+        boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        padding: '3rem',
+        textAlign: 'center'
+      }}>
+        {/* Empty State */}
+        <div style={{
+          fontSize: '4rem',
+          marginBottom: '1rem',
+          opacity: 0.3
+        }}>📄</div>
+        <h3 style={{
+          fontSize: '1.5rem',
+          color: '#6b7280',
+          marginBottom: '1rem'
+        }}>No Payslip Available</h3>
+        <p style={{
+          color: '#9ca3af',
+          fontSize: '1rem',
+          lineHeight: '1.5',
+          maxWidth: '400px',
+          margin: '0 auto'
+        }}>
+          Your payslip will appear here once payroll has been processed for the current month. 
+          Please contact HR if you believe this is an error.
+        </p>
+        <div style={{
+          marginTop: '2rem',
+          padding: '1rem',
+          backgroundColor: '#f3f4f6',
+          borderRadius: '8px',
+          fontSize: '0.875rem',
+          color: '#6b7280'
+        }}>
+          💡 Payslips are typically generated at the end of each month after attendance and leave records are finalized.
+        </div>
+      </div>
+    );
+  }
+
+  const data = payslip;
   
   const gross = Object.values(data.earnings).reduce((s, v) => s + v, 0);
   const totalDeductions = Object.values(data.deductions).reduce((s, v) => s + v, 0);
