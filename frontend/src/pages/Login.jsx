@@ -13,7 +13,7 @@ const Login = () => {
   const testAPI = async () => {
     try {
       console.log('Testing API connection...');
-      const response = await fetch('http://localhost:4000/api/health');
+      const response = await fetch('https://workzen-crm-odoo.onrender.com/api/health');
       const data = await response.json();
       console.log('API test response:', data);
       alert('API connection successful: ' + JSON.stringify(data));

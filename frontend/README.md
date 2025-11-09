@@ -28,7 +28,7 @@ React frontend for HRMS system.
 
 The frontend currently uses mock data. To connect to the real backend:
 
-1. Ensure the backend is running on `http://localhost:4000`
+1. Ensure the backend is running on `https://workzen-crm-odoo.onrender.com`
 2. Replace mock data in pages with actual API calls using the `api` instance from `src/api/http.js`
 
 Example:

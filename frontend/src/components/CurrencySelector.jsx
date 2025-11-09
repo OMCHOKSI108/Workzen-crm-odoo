@@ -20,7 +20,7 @@ export default function CurrencySelector() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/settings/currency', {
+      const response = await fetch('https://workzen-crm-odoo.onrender.com/api/settings/currency', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -45,7 +45,7 @@ export default function CurrencySelector() {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/settings/currency', {
+      const response = await fetch('https://workzen-crm-odoo.onrender.com/api/settings/currency', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

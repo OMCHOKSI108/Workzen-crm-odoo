@@ -346,7 +346,7 @@ const fetchEmployees = async () => {
 # Backend (Terminal 1)
 cd backend
 npm start
-# Server running on http://localhost:4000
+# Server running on https://workzen-crm-odoo.onrender.com
 
 # Frontend (Terminal 2)
 cd frontend
@@ -469,7 +469,7 @@ PORT=4000
 ### Frontend (Vite)
 ```javascript
 // src/api/http.js
-const API_BASE_URL = 'http://localhost:4000/api';
+const API_BASE_URL = 'https://workzen-crm-odoo.onrender.com/api';
 ```
 
 ---
