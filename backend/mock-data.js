@@ -74,7 +74,7 @@ const mockAttendance = [
   {
     _id: "64f1a2b3c4d5e6f7g8h9i0j5",
     employee: "64f1a2b3c4d5e6f7g8h9i0j4",
-    employeeName: "pentagon Kukadiya",
+    employeeName: "pentagon PENTAGON",
     date: "2024-12-15",
     clockIn: "2024-12-15T09:00:00Z",
     clockOut: "2024-12-15T18:00:00Z",
@@ -94,7 +94,7 @@ const mockLeaves = [
   {
     _id: "64f1a2b3c4d5e6f7g8h9i0j6",
     employee: "64f1a2b3c4d5e6f7g8h9i0j4",
-    employeeName: "pentagon Kukadiya",
+    employeeName: "pentagon PENTAGON",
     startDate: "2024-01-15",
     endDate: "2024-01-17",
     type: "annual",
@@ -127,7 +127,7 @@ const mockPayrun = {
 const mockPayslip = {
   _id: "64f1a2b3c4d5e6f7g8h9i0j8",
   employee: "64f1a2b3c4d5e6f7g8h9i0j4",
-  employeeName: "pentagon Kukadiya",
+  employeeName: "pentagon PENTAGON",
   payrun: "64f1a2b3c4d5e6f7g8h9i0j7",
   month: 12,
   year: 2024,
@@ -157,7 +157,7 @@ const mockPayslip = {
 const mockPayrollReport = [
   {
     employeeId: "EMP001",
-    employeeName: "pentagon Kukadiya",
+    employeeName: "pentagon PENTAGON",
     basic: 50000,
     allowances: 35000,
     deductions: 12235,
@@ -168,7 +168,7 @@ const mockPayrollReport = [
 const mockAttendanceReport = [
   {
     employeeId: "EMP001",
-    employeeName: "pentagon Kukadiya",
+    employeeName: "pentagon PENTAGON",
     department: "Engineering",
     totalDays: 22,
     presentDays: 20,
@@ -181,7 +181,7 @@ const mockAttendanceReport = [
 const mockLeaveReport = [
   {
     employeeId: "EMP001",
-    employeeName: "pentagon Kukadiya",
+    employeeName: "pentagon PENTAGON",
     department: "Engineering",
     annualLeave: {
       used: 2,
